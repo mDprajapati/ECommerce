@@ -1,0 +1,181 @@
+﻿@model ECommerce.ViewModel.ProductVM
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>PostProduct</title>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+            <a class="navbar-brand" href="#"><b><<i>E-Commerce</i>></b></a>
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                
+            </ul>
+        </div>
+        <div class="pos-f-t">
+            <form class="form-inline">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <button type="button" onclick="returntopage()" class="btn btn-outline-dark"><i class="fa fa-bars" aria-hidden="true"></i>Prodct List </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </nav>
+
+
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            
+            
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ProductName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ProductName, new { htmlAttributes = new { @class = "form-control", @id = "Pname" } })
+                    @Html.ValidationMessageFor(model => model.ProductName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CatagoryID, "catagories", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("catagories", null, new { htmlAttributes = new { @class = "form-control", @id = "Cid" } })
+                    @Html.ValidationMessageFor(model => model.CatagoryID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.QuantityID, "quantities", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("quantities", null, new { htmlAttributes = new { @class = "form-control", @id = "Qid" } })
+                    @Html.ValidationMessageFor(model => model.QuantityID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ProductPrice, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ProductPrice, new { htmlAttributes = new { @class = "form-control", @id = "PPrice" } })
+                    @Html.ValidationMessageFor(model => model.ProductPrice, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="control-label col-md-2">
+                    <label>ProductImage</label>
+                </div>
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="file" id="FileUpload1" onchange="encodeBase64(this)" />
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="button" value="Create" onclick="Submit()" class="btn btn-outline-dark" />
+                </div>
+            </div>
+        </div>
+    }
+</body>
+</html>
+<script type="text/javascript">
+    var base = base;
+    function Submit() {
+        var res = validate();
+        if (res == false) {
+            return false;
+        }  
+        var obj = {
+
+            ProductName: $("#Pname").val(),
+            CatagoryID: $("#catagories").val(),
+            QuantityID: $("#quantities").val(),
+            ProductPrice: $("#PPrice").val(),
+            ProductImage: base,
+        }
+        console.log(obj);
+       
+        $.ajax({
+            url: 'https://localhost:44392/API/PostProduct',
+            type: 'POST',
+            data: obj,
+            success: function (data) {
+                var returntoindex = '@Url.Action("Index")';
+                window.location.href = returntoindex;
+            },
+           
+        });
+    }
+    function validate() {
+        var isValid = true;
+        if ($('#Pname').val().trim() == "") {
+            $('#Pname').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#Pname').css('border-color', 'lightgrey');
+        }
+        if ($('#catagories').val().trim() == "") {
+            $('#catagories').css('list-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#catagories').css('border-color', 'lightgrey');
+        }
+        if ($('#quantities').val().trim() == "") {
+            $('#quantities').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#quantities').css('border-color', 'lightgrey');
+        }
+        if ($('#PPrice').val().trim() == "") {
+            $('#PPrice').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#PPrice').css('border-color', 'lightgrey');
+        }
+        return isValid;  
+    }
+    function encodeBase64(elm) {
+        var file = elm.files[0];
+        var imgReader = new FileReader();
+        imgReader.onload = function () {
+            base = imgReader.result;
+        }
+        imgReader.readAsDataURL(file);
+    }
+    function returntopage() {
+        var returntoindex = '@Url.Action("Index")';
+        window.location.href = returntoindex;
+    }
+</script>

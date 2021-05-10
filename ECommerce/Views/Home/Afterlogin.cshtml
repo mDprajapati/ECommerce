@@ -1,0 +1,189 @@
+﻿
+@{
+    ViewBag.Title = "Login in User";
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
+
+    <style type="text/css">
+        .fakeimg {
+            height: 200px;
+            background: #aaa;
+        }
+
+        .checked {
+            color: orange;
+        }
+
+        .avatar {
+            vertical-align: middle;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+    </style>
+    <title>Index</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+            <a class="navbar-brand"><b><<i>E-Commerce</i>></b></a>
+           
+        </div>
+        <div class="pos-f-t">
+            <form class="form-inline">
+                <div class="input-group">
+                    <div class="input-group-prepend ">
+                        <button type="button" onclick="MyCart()" class="btn btn-outline-dark "><i class="fa fa-shopping-cart" aria-hidden="true"></i>Cart</button>
+                    </div>
+                    <div class="input-group-prepend">
+                        <button type="button" onclick="logout()" class="btn btn-outline-dark"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="col">
+            <div class="row" id="myImage">
+            </div>
+        </div>
+        <div class="container">
+            <div class="rating ">
+
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>
+<script type="text/javascript">
+    $('#logout').click(function (){
+        sessionStorage.removeItem('accessToken');
+    window.location.href = 'https://localhost:44392/Home/loginuser';
+    });
+
+    $(document).ready(function () {
+        $.ajax({
+            url: 'https://localhost:44392/API/GetProduct',
+            type: 'GET',
+            success: function (response) {
+
+                var html = '';
+                $.each(response, function (key, item) {
+                    html += '<div class="col-md-3">';
+                    html += '<img style=height:200px;width:190px;border-radius:5px src = ' + item.ProductImage + ' />';
+                    html += '<h4>' + item.ProductName + '</h4>';
+                    html += '<h5>' + item.ProductPrice + '</h5>';
+                    html += '<div class="rating"  onclick=addrating(' + item.ProductID + ')></div >';
+                    html += '<td> <a onclick= AddCart(' + item.ProductID + ') class="btn btn-info">Add Cart</a> </td > ';
+                    html += '<td> <a onclick = buynow(' + item.ProductID + ') class="btn btn-danger">Buy Now</a > </td>';
+                    html += '</div>';
+
+               });
+                $('#myImage').html(html);
+                Rating();
+           },
+            error: function (error) {
+             alert("Something wrond in code!!!");
+            }
+        });
+    });
+    function buynow(ProductID) {
+        var redirecturl = '@Url.Action("BuyNow","Home")?ProductID=' + ProductID;
+        window.location.href = redirecturl;
+    }
+    function AddCart(ProductID) {
+
+        var obj = {
+            ProductID: ProductID
+        }
+        swal({
+            title: "Item Added!",
+            icon: "success",
+            button: "Ok!",
+        }).then((productdata) => {
+            if (productdata) {
+                $.ajax({
+                    url: 'https://localhost:44392/API/AddCart',
+                    type: 'POST',
+                    data: obj,
+                    success: function (response) {
+                        location.reload();
+                    }
+                });
+            }
+        });
+    }
+
+    var Pro_Id = 0;
+    function addrating(ProductID) {
+        
+        Pro_Id = parseInt(ProductID)
+    }
+
+    function Rating() {
+        debugger
+        var addrating = $(".rating").rateYo();
+        $(".rating").click(function () {
+            var rating = addrating.rateYo("rating");
+            var save = {
+                Rate: rating,
+            };
+            var res = Math.max.apply(Math, save.Rate);
+            var obj = {
+                RatingNumber: res,
+                ProductID: Pro_Id
+            };
+            debugger
+            $.ajax({
+                url: 'https://localhost:44392/API/Rating',
+                type: 'POST',
+                data: obj,
+                success: function (data) {
+                    swal({
+                        title: "Successfully",
+                        text: "Thanks for Ratting!",
+                        icon: "success"
+                    });
+                },
+                error: function (error) {
+                    window.location.replace("https://localhost:44392/Home/loginuser");
+                }
+            });
+        });
+    }
+
+
+    function returntopage() {
+        var redirect = '@Url.Action("PostProduct","Home")';
+        window.location.href = redirect;
+    }
+    function logout() {
+        var redirect = '@Url.Action("loginuser","Home")';
+        window.location.href = redirect;
+    }
+
+    function MyCart() {
+        var redirect = '@Url.Action("MyProducts", "Home")';
+        window.location.href = redirect;
+    }
+
+</script>

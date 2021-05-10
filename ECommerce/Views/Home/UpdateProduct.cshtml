@@ -1,0 +1,147 @@
+﻿@model ECommerce.ViewModel.ProductVM
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <title>UpdateProduct</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+            <a class="navbar-brand" href="~/Views/Home/loginuser.cshtml."><b><<i>E-Commerce</i>></b></a>
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="data.html">Members</a>
+                </li>
+            </ul>
+        </div>
+        <div class="pos-f-t">
+            <form class="form-inline">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <button type="button" onclick="returntopage()" class="btn btn-outline-dark"><i class="fa fa-plus-square" aria-hidden="true"></i>My Products </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </nav>
+
+
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h4>ProductVM</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.ProductID)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ProductName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ProductName, new { htmlAttributes = new { @class = "form-control", @id = "Pname" } })
+                    @Html.ValidationMessageFor(model => model.ProductName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CatagoryID, "catagories", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("catagories", null, new { htmlAttributes = new { @class = "form-control", @id = "Cid" } })
+                    @Html.ValidationMessageFor(model => model.CatagoryID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.QuantityID, "quantities", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("quantities", null, new { htmlAttributes = new { @class = "form-control", @id = "Qid" } })
+                    @Html.ValidationMessageFor(model => model.QuantityID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.ProductPrice, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ProductPrice, new { htmlAttributes = new { @class = "form-control", @id = "PPrice" } })
+                    @Html.ValidationMessageFor(model => model.ProductPrice, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="control-label col-md-2">
+                    <label>ProductImage</label>
+                </div>
+                <div class="col-md-offset-2 col-md-10">
+                    <img style=height:100px;width:100px;border-radius:5px; src="@Model.ProductImage" />
+                    <input type="file" id="FileUpload1" onchange="encodeBase64(this)" />
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" onclick="UpdateProduct()" value="Save" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    }
+
+</body>
+</html>
+<script type="text/javascript">
+    var base = base;
+    var response = response;
+    function UpdateProduct() {
+     
+        var obj = {            
+            ProductID: $('#ProductID').val(),
+            ProductName: $("#Pname").val(),
+            CatagoryID: $("#catagories").val(),
+            QuantityID: $("#quantities").val(),
+            ProductPrice: $("#PPrice").val(),
+            ProductImage: response,
+        }
+        $.ajax({
+            url: 'https://localhost:44392/API/PostProduct',
+            method: 'POST',
+            data: obj,
+            success: function (data) {
+                var redirecturl = '@Url.Action("Index","Home")';
+                window.location.href = redirecturl;
+            }
+        });
+    }
+    function encodeBase64(elm) {
+        var file = elm.files[0];
+        var imgReader = new FileReader();
+        imgReader.onload = function () {
+            base = imgReader.result;
+        }
+        imgReader.readAsDataURL(file);
+    }
+    function returntopage() {
+        var returntolist = '@Url.Action("Index","Home")';
+        window.location.href = returntolist;
+    }
+</script>

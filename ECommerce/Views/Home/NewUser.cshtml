@@ -1,0 +1,259 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" />
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
+    <style type="text/css">
+    </style>
+    <title>Index</title>
+</head>
+<body>
+   
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+       
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+            <a class="navbar-brand"><b><<i>E-Commerce</i>></b></a>
+
+        </div>
+        <div class="pos-f-t">
+            <form class="form-inline">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <button type="button" onclick="orderhistory()" class="btn btn-outline-dark "><i class="fa fa-shopping-cart" aria-hidden="true"></i>Order History</button>
+                    </div>
+                    <div class="input-group-prepend">
+                        <button type="button" onclick="MyCart()" class="btn btn-outline-dark "><i class="fa fa-shopping-cart" aria-hidden="true"></i>Cart</button>
+                    </div>
+                    <div class="input-group-prepend" id="logout">
+                        <button type="button" onclick="logout()" class="btn btn-outline-dark"><i class="fa fa-sign-out" aria-hidden="true"></i>Logout</button>
+                    </div>
+                    <div class="input-group-prepend" id="login">
+                        <button type="button" onclick="login()" class="btn btn-outline-dark"><i class="fa fa-sign-out" aria-hidden="true"></i>Login</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="col">
+            <div class="row " id="myImage">
+            </div>
+        </div>
+    </div>
+
+    @*<div class=" container">
+        <div class="col">
+            <div class="rating ">
+
+            </div>
+        </div>
+    </div>*@
+
+
+</body>
+</html>
+<script type="text/javascript">
+
+    var Pro_Id = 0;
+    $(document).ready(function () {
+        loadData();
+    });
+
+    function orderhistory() {
+        var redirect = '@Url.Action("OrderHistory", "Home")';
+        window.location.href = redirect;
+    }
+    function loadData() {
+        $.ajax({
+            url: 'https://localhost:44392/API/GetProduct',
+            type: 'GET',
+            success: function (response) {
+
+                var html = '';
+                $.each(response, function (key, item) {
+
+                    if (item.QuantityNumbers > 0 && item.UserID > 0) {
+                        $("#logout").show();
+                        $("#login").hide();
+                        html += '<div class="col-md-3 ">';
+                        html += '<img class="align-self-center img-fluid" style=height:200px;width:190px;border-radius:5px   src = ' + item.ProductImage + ' />';
+                        html += '<h4>' + item.ProductName + '</h4>';
+                        html += '<h5><i class="fa fa-inr">' + item.ProductPrice + '</i></h5>';
+                        html += '<div class="rating"  onclick=addrating(' + item.ProductID + ') ></div >';
+                        html += '<button calss="btn">' + item.RatingAvrage + '</button>';
+                        html += '<td> <a onclick= AddCart(' + item.ProductID + ') class="btn btn-info">Add Cart</a> </td > ';
+                        html += '<td> <a onclick = buynow(' + item.ProductID + ') class="btn btn-danger">Buy Now</a > </td>';
+                        html += '</div>';
+                    }
+                    else {
+                        if (item.QuantityNumbers > 0 && item.UserID == 0) {
+                            $("#logout").hide();
+                            $("#login").show();
+                            html += '<div class="col-md-3 ">';
+                            html += '<img class="align-self-center img-fluid" style=height:200px;width:190px;border-radius:5px   src = ' + item.ProductImage + ' />';
+                            html += '<h4>' + item.ProductName + '</h4>';
+                            html += '<h5><i class="fa fa-inr">' + item.ProductPrice + '</i></h5>';
+                            html += '<div class="rating"  onclick=addrating(' + item.ProductID + ') ></div >';
+                            html += '<button calss="btn">' + item.RatingAvrage + '</button>';
+                            html += '<td> <a onclick= AddCart(' + item.ProductID + ') class="btn btn-info">Add Cart</a> </td > ';
+                            html += '<td> <a onclick = buynow(' + item.ProductID + ') class="btn btn-danger">Buy Now</a > </td>';
+                            html += '</div>';
+                        }
+                        else {
+                            $("#logout").show();
+                            $("#login").hide();
+                            html += '<div class="col-md-3 ">';
+                            html += '<img  class="align-self-center img-fluid"style=height:200px;width:190px;border-radius:5px   src = ' + item.ProductImage + ' />';
+                            html += '<h4>' + item.ProductName + '</h4>';
+                            html += '<h5><i class="fa fa-inr">' + item.ProductPrice + '</i></h5>';
+                            html += '<button calss="btn">' + item.RatingAvrage + '</button>';
+                            html += '<div class="font weight bold"><h3 style="colour:Gray">Out of Stock </h2></div>';
+                            html += '</div>';
+                        }
+                    }
+                });
+                $('#myImage').html(html);
+                Rating();
+            },
+            error: function (error) {
+                alert("Something wrond in code!!!");
+            }
+        });
+    }
+
+    $('#logout').click(function (){
+        sessionStorage.removeItem('accessToken');
+    window.location.href = 'https://localhost:44392/Home/loginuser';
+    });
+
+    function buynow(ProductID) {
+        var redirecturl = '@Url.Action("BuyNow","Home")?ProductID=' + ProductID;
+        window.location.href = redirecturl;
+    }
+    function AddCart(ProductID) {
+
+        var obj = {
+            ProductID: ProductID
+        }
+        swal({
+            title: "Item Added!",
+            icon: "success",
+            button: "Ok!",
+        }).then((productdata) => {
+            if (productdata) {
+                $.ajax({
+                    url: 'https://localhost:44392/API/AddCart',
+                    type: 'POST',
+                    data: obj,
+                    success: function (response) {
+                        location.reload();
+                    }
+                });
+            }
+        });
+
+    }
+
+    function addrating(ProductID) {
+        Pro_Id = parseInt(ProductID)
+    }
+
+    function Rating() {
+       
+        var addrating = $(".rating").rateYo();
+        $(".rating").click(function () {
+            var rating = addrating.rateYo("rating");
+            var save  = {
+                Rate: rating,
+            };
+            var res  = Math.max.apply(Math, save.Rate);
+            var obj = {
+                RatingNumber: res,
+                ProductID: Pro_Id
+            };
+            
+            
+            $.ajax({
+                url: 'https://localhost:44392/API/Rating',
+                type: 'POST',
+                data: obj,
+                success: function (data) {
+                    swal({
+                        title: "Successfully",
+                        text: "Thanks for Ratting!",
+                        icon: "success"
+                    });
+                },
+                error: function (error) {
+
+                    window.location.replace("https://localhost:44392/Home/loginuser");
+                }
+            });
+        });
+    }
+
+     function buynow(ProductID) {
+        var redirecturl = '@Url.Action("MyProducts","Home")?ProductID=' + ProductID;
+        window.location.href = redirecturl;
+    }
+    function AddCart(ProductID) {
+
+        var obj = {
+            ProductID: ProductID
+        }
+        swal({
+            title: "Item Added!",
+            icon: "success",
+            button: "Ok!",
+        }).then((productdata) => {
+            if (productdata) {
+                $.ajax({
+                    url: 'https://localhost:44392/API/AddCart',
+                    type: 'POST',
+                    data: obj,
+                    success: function (response) {
+                        location.reload();
+                    }
+                });
+            }
+        });
+    }
+
+
+
+
+    function returntopage() {
+        var redirect = '@Url.Action("PostProduct","Home")';
+        window.location.href = redirect;
+    }
+    function login() {
+        var redirect = '@Url.Action("loginuser","Home")';
+        window.location.href = redirect;
+    }
+
+    function MyCart() {
+        var redirect = '@Url.Action("MyProducts", "Home")';
+        window.location.href = redirect;
+    }
+
+
+
+
+</script>
